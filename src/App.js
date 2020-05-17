@@ -22,11 +22,12 @@ function App() {
   const [importFiles, setImportFiles] = useState([])
   const [filesToImport, setFilesToImport] = useState('')
 
+  const loadProducts = async () => {
+    const response = await api.get('products')
+    setProducts(response.data)
+  }
+
   useEffect(() => {
-    const loadProducts = async () => {
-      const response = await api.get('products')
-      setProducts(response.data)
-    }
     loadProducts();
   }, [])
 
@@ -37,7 +38,29 @@ function App() {
     const filesName = filesArray.map(file => ' '+file.name)
     
     setFilesToImport(filesName)
-    setImportFiles(files)
+    setImportFiles(filesArray)
+  }
+
+  async function handleSendFileToImport(){
+    try{
+      const files = new FormData() 
+      
+      for (let i = 0; i < importFiles.length; i++) {
+        files.append(`files`, importFiles[i])
+      }
+
+      const response = await api.post('products', files)
+
+      if(response.status === 200){
+        console.log("Sucesso!!")
+      }
+
+      setFilesToImport([])
+      setImportFiles('')
+      loadProducts()
+    }catch(err){
+      console.log(err)
+    }
   }
 
   return (
@@ -50,18 +73,10 @@ function App() {
         marginTop: '50px',
         width: '100%'
       }}>
-        <Input 
-        value={filesToImport} 
-        style={{
-          marginRight: '20px',
-          width: '50%'
-        }}
-        fullWidth
-        />
-        <Button
+
+      <Button
           variant="contained"
           component="label"
-          
         >
           Upload File
           <input
@@ -71,6 +86,27 @@ function App() {
             accept="application/json"
             onChange={handleImportFiles}
           />
+        </Button>
+        <Input 
+        value={filesToImport} 
+        style={{
+          marginLeft: '20px',
+          width: '50%'
+        }}
+        fullWidth
+        />
+
+        <Button
+          style={{
+            padding: '10px 20px 10px 20px',
+            marginLeft: '30px'
+          }}
+          variant="contained" 
+          color="primary"
+          size='medium'
+          onClick={handleSendFileToImport}
+        >
+          Enviar
         </Button>
       </div>
       <TableContainer component={Paper}>
