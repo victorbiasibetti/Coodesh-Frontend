@@ -12,12 +12,15 @@ import Delete from '@material-ui/icons/Delete';
 import Edit from '@material-ui/icons/Edit';
 
 import Button from '@material-ui/core/Button';
+import Input from '@material-ui/core/Input';
 
 import api from './service/api'
 
 function App() {
 
   const [products, setProducts] = useState([])
+  const [importFiles, setImportFiles] = useState([])
+  const [filesToImport, setFilesToImport] = useState('')
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -27,17 +30,46 @@ function App() {
     loadProducts();
   }, [])
 
+  function handleImportFiles({target}){
+    const files = target.files
+    
+    const filesArray = Array.from(files)
+    const filesName = filesArray.map(file => ' '+file.name)
+    
+    setFilesToImport(filesName)
+    setImportFiles(files)
+  }
+
   return (
     <div>
-      <div>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
+        marginTop: '50px',
+        width: '100%'
+      }}>
+        <Input 
+        value={filesToImport} 
+        style={{
+          marginRight: '20px',
+          width: '50%'
+        }}
+        fullWidth
+        />
         <Button
           variant="contained"
           component="label"
+          
         >
           Upload File
           <input
             type="file"
+            multiple
             style={{ display: "none" }}
+            accept="application/json"
+            onChange={handleImportFiles}
           />
         </Button>
       </div>
@@ -55,7 +87,7 @@ function App() {
         </TableHead>
         <TableBody>
           {products.map((product) => (
-            <TableRow key={product.name}>
+            <TableRow key={product.title}>
               <TableCell component="th" scope="row">
                 {product.title}
               </TableCell>
