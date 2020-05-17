@@ -14,6 +14,11 @@ import Edit from '@material-ui/icons/Edit';
 import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
 
+import Dialog from '@material-ui/core/Dialog';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import api from './service/api'
 
 function App() {
@@ -41,6 +46,39 @@ function App() {
     setImportFiles(filesArray)
   }
 
+  function ToastMessage(message, type){
+    switch(type){
+      case 'success': 
+      toast.success(message, {
+        position: toast.POSITION.TOP_RIGHT,      
+        });
+        break;
+      case 'info': 
+        toast.info(message, {
+          position: toast.POSITION.TOP_RIGHT,      
+          });
+        break;
+      case 'warn': 
+        toast.warn(message, {
+          position: toast.POSITION.TOP_RIGHT,      
+          });
+        break;
+      case 'error': 
+        toast.error('Mensagem customizada', {
+          position: toast.POSITION.TOP_RIGHT,      
+          });
+        break;
+      default: 
+        toast('Mensagem customizada', {
+          position: toast.POSITION.TOP_RIGHT,
+          closeButton: false,
+          bodyStyle: {color: 'black'}
+        });
+        break;
+      
+    }
+  }
+
   async function handleSendFileToImport(){
     try{
       const files = new FormData() 
@@ -52,7 +90,7 @@ function App() {
       const response = await api.post('products', files)
 
       if(response.status === 200){
-        console.log("Sucesso!!")
+        ToastMessage('Arquivos importados com sucesso', 'success')
       }
 
       setFilesToImport([])
@@ -65,6 +103,12 @@ function App() {
 
   return (
     <div>
+      <ToastContainer />
+
+      <Dialog>
+        
+      </Dialog>
+
       <div style={{
         display: 'flex',
         justifyContent: 'center',
@@ -133,7 +177,7 @@ function App() {
               <TableCell align="right">{product.createdAt}</TableCell>
               <TableCell align="right">
                 <IconButton color="primary" aria-label="edit" component="span">
-                  <Edit />
+                  <Edit  />
                 </IconButton>
                 <IconButton color="primary" aria-label="delete" component="span">
                   <Delete />
