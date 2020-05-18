@@ -1,13 +1,13 @@
 import React from 'react';
-import { parseISO, format } from 'date-fns'
+import { parseISO, format } from 'date-fns';
 import {
-  Table, 
+  Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  IconButton
+  IconButton,
 } from '@material-ui/core';
 import Paper from '@material-ui/core/Paper';
 import Delete from '@material-ui/icons/Delete';
@@ -15,10 +15,10 @@ import Edit from '@material-ui/icons/Edit';
 
 // import { Container } from './styles';
 
-function TableComponent({products, DialogUpdateOpen, DialogDeleteOpen}) {
+function TableComponent({ products, DialogUpdateOpen, DialogDeleteOpen }) {
   return (
     <TableContainer component={Paper}>
-      <Table  aria-label="simple table">
+      <Table aria-label="simple table">
         <TableHead>
           <TableRow>
             <TableCell>Title</TableCell>
@@ -37,26 +37,33 @@ function TableComponent({products, DialogUpdateOpen, DialogDeleteOpen}) {
               </TableCell>
               <TableCell align="right">{product.type}</TableCell>
               <TableCell align="right">{product.rating}</TableCell>
-              <TableCell align="right">{new Intl.NumberFormat("pt-BR", {
-                  style: "currency",
-                  currency: "BRL",
+              <TableCell align="right">
+                {new Intl.NumberFormat('pt-BR', {
+                  style: 'currency',
+                  currency: 'BRL',
                   minimumFractionDigits: 2,
-                  maximumFractionDigits: 2
+                  maximumFractionDigits: 2,
                 }).format(product.price)}
               </TableCell>
-              <TableCell align="right">{
-                format(
-                  parseISO(product.createdAt), 
-                  "dd/MM/yyyy HH:mm:ss 'GMT' XXX"
-                  ) 
-                }</TableCell>
               <TableCell align="right">
-                <IconButton color="primary" aria-label="edit" component="span" 
+                {format(
+                  parseISO(product.createdAt),
+                  "dd/MM/yyyy HH:mm:ss 'GMT' XXX"
+                )}
+              </TableCell>
+              <TableCell align="right">
+                <IconButton
+                  color="primary"
+                  aria-label="edit"
+                  component="span"
                   onClick={() => DialogUpdateOpen(product)}
                 >
-                  <Edit  />
+                  <Edit />
                 </IconButton>
-                <IconButton color="primary" aria-label="delete" component="span"
+                <IconButton
+                  color="primary"
+                  aria-label="delete"
+                  component="span"
                   onClick={() => DialogDeleteOpen(product)}
                 >
                   <Delete />
