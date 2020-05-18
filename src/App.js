@@ -7,8 +7,6 @@ import TableComponent from './components/Table'
 import DialogUpdate from './components/DialogUpdate'
 import DialogDelete from './components/DialogDelete'
 
-import NumberFormat from 'react-number-format';
-
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -52,9 +50,6 @@ function App() {
     setDeleteProduct({})
     setOpenDialogDelete(false)
   }
-
-  
-
 
   function handleImportFiles({target}){
     const files = target.files
@@ -120,12 +115,11 @@ function App() {
         // eslint-disable-next-line no-throw-literal
         throw('Error on import products');
       }
-
       setFilesToImport([])
       setImportFiles('')
       loadProducts()
     }catch(err){
-      console.log(err)
+      ToastMessage(err, 'error')
     }
   }
 

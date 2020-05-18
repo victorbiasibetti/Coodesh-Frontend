@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { parseISO, format } from 'date-fns'
 import {
   Table, 
   TableBody,
@@ -37,8 +37,19 @@ function TableComponent({products, DialogUpdateOpen, DialogDeleteOpen}) {
               </TableCell>
               <TableCell align="right">{product.type}</TableCell>
               <TableCell align="right">{product.rating}</TableCell>
-              <TableCell align="right">{product.price}</TableCell>
-              <TableCell align="right">{product.createdAt}</TableCell>
+              <TableCell align="right">{new Intl.NumberFormat("pt-BR", {
+                  style: "currency",
+                  currency: "BRL",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                }).format(product.price)}
+              </TableCell>
+              <TableCell align="right">{
+                format(
+                  parseISO(product.createdAt), 
+                  "dd/MM/yyyy HH:mm:ss 'GMT' XXX"
+                  ) 
+                }</TableCell>
               <TableCell align="right">
                 <IconButton color="primary" aria-label="edit" component="span" 
                   onClick={() => DialogUpdateOpen(product)}
