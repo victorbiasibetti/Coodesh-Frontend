@@ -1,4 +1,4 @@
-## Available Scripts
+## Projeto Frontend
 
 Este projeto é parte da prova para desenvolvedor na Coodesh.
 
