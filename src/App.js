@@ -1,30 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
-
-import IconButton from '@material-ui/core/IconButton';
-import Delete from '@material-ui/icons/Delete';
-import Edit from '@material-ui/icons/Edit';
 
 import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
 
-import NumberFormat from 'react-number-format';
+import TableComponent from './components/Table'
+import DialogUpdate from './components/DialogUpdate'
+import DialogDelete from './components/DialogDelete'
 
-import {
-  Dialog, 
-  DialogTitle, 
-  DialogActions, 
-  DialogContent, 
-  DialogContentText,
-  TextField,
-  InputLabel
-} from '@material-ui/core';
+import NumberFormat from 'react-number-format';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -69,142 +52,8 @@ function App() {
     setDeleteProduct({})
     setOpenDialogDelete(false)
   }
-    
 
-  function DialogUpdate(){
-    const [title, setTitle] = useState(updateProduct.title)
-    const [type, setType] = useState(updateProduct.type)
-    const [price, setPrice] = useState(updateProduct.price)
-    
-    function handleChangeTitle(title){
-      setTitle(title.target.value)
-    }
-    function handleChangeType(type){
-      setType(type.target.value)
-    }
-    function handleChangePrice(price){
-      setPrice(price.target.value)
-    }
-
-    async function handleUpdateProduct(){
-      try{
-        handleCloseDialogUpdate();
-        const response = await api.put(`products/${updateProduct._id}`, {
-          title, type, price
-        })
-        if(response.status === 200){
-          ToastMessage('Update product success', 'success')
-        }
-        
-        loadProducts()
-      }catch(err){
-        ToastMessage(err, 'error')
-        handleCloseDialogUpdate();
-      }
-    }
-
-    return (
-      <Dialog 
-        open={openDialog} 
-        onClose={handleCloseDialogUpdate} 
-        aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">
-          Edit {updateProduct.title}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            Change values and update the product
-          </DialogContentText>
-          <InputLabel>Title</InputLabel>
-          <TextField
-            autoFocus
-            id="title"
-            fullWidth
-            value={title}
-            onChange={handleChangeTitle}
-            
-          />
-          <div style={{
-            paddingTop: '20px'
-          }}>
-          <InputLabel>Type</InputLabel>
-          <TextField
-            margin="dense"
-            id="type"
-            fullWidth
-            value={type}
-            onChange={handleChangeType}
-          />
-          </div>
-          <div style={{
-            paddingTop: '20px'
-          }}>
-          <InputLabel>Price</InputLabel>
-          <TextField
-          value={price}
-          onChange={handleChangePrice}
-          id="Price"
-          fullWidth
-          type='number'
-          margin="dense"
-          />
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialogUpdate} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={() => handleUpdateProduct(updateProduct)} color="primary" variant="contained">
-            Save
-          </Button>
-        </DialogActions>
-    </Dialog>
-    );
-  }
-
-  function DialogDelete(){
-    async function handleDeleteProduct(){
-      try{
-        handleCloseDialogDelete();
-        const response = await api.delete(`products/${deleteProduct._id}`)
-        if(response.status === 200){
-          ToastMessage('Delete product success', 'success')
-        }else{
-          // eslint-disable-next-line no-throw-literal
-          throw('Error on delete product');
-        }
-        loadProducts()
-      }catch(err){
-        ToastMessage(err, 'error')
-        handleCloseDialogDelete();
-      }
-    }
-
-    return (
-      <Dialog 
-        open={openDialogDelete} 
-        onClose={handleCloseDialogDelete} 
-        aria-labelledby="form-dialog-title">
-        <DialogTitle id="form-dialog-title">
-          Delete {deleteProduct.title}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            You confirm to delete product?
-            This operation is not rollback!
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialogDelete} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={() => handleDeleteProduct()} color="primary" variant="contained">
-            Confirm
-          </Button>
-        </DialogActions>
-    </Dialog>
-    );
-  }
+  
 
 
   function handleImportFiles({target}){
@@ -254,6 +103,11 @@ function App() {
     try{
       const files = new FormData() 
       
+      if(importFiles.length === 0){
+        ToastMessage('Select file to import', 'warn')
+        return;
+      }
+
       for (let i = 0; i < importFiles.length; i++) {
         files.append(`files`, importFiles[i])
       }
@@ -261,7 +115,10 @@ function App() {
       const response = await api.post('products', files)
 
       if(response.status === 200){
-        ToastMessage('Arquivos importados com sucesso', 'success')
+        ToastMessage('Success to import products', 'success')
+      }else{
+        // eslint-disable-next-line no-throw-literal
+        throw('Error on import products');
       }
 
       setFilesToImport([])
@@ -276,9 +133,21 @@ function App() {
     <div>
       <ToastContainer />
 
-      <DialogUpdate />
+      <DialogUpdate 
+        updateProduct={updateProduct}
+        handleCloseDialogUpdate={handleCloseDialogUpdate}
+        ToastMessage={ToastMessage}
+        loadProducts={loadProducts}
+        openDialog={openDialog}
+      />
 
-      <DialogDelete />
+      <DialogDelete 
+        deleteProduct={deleteProduct}
+        handleCloseDialogDelete={handleCloseDialogDelete}
+        ToastMessage={ToastMessage}
+        loadProducts={loadProducts}
+        openDialogDelete={openDialogDelete}
+      />
 
       <div style={{
         display: 'flex',
@@ -321,48 +190,16 @@ function App() {
           size='medium'
           onClick={handleSendFileToImport}
         >
-          Enviar
+          Import
         </Button>
       </div>
-      <TableContainer component={Paper}>
-      <Table  aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>Title</TableCell>
-            <TableCell align="right">Type</TableCell>
-            <TableCell align="right">Rating</TableCell>
-            <TableCell align="right">Price</TableCell>
-            <TableCell align="right">Created</TableCell>
-            <TableCell align="right">Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {products.map((product) => (
-            <TableRow key={product._id}>
-              <TableCell component="th" scope="row">
-                {product.title}
-              </TableCell>
-              <TableCell align="right">{product.type}</TableCell>
-              <TableCell align="right">{product.rating}</TableCell>
-              <TableCell align="right">{product.price}</TableCell>
-              <TableCell align="right">{product.createdAt}</TableCell>
-              <TableCell align="right">
-                <IconButton color="primary" aria-label="edit" component="span" 
-                  onClick={() => DialogUpdateOpen(product)}
-                >
-                  <Edit  />
-                </IconButton>
-                <IconButton color="primary" aria-label="delete" component="span"
-                  onClick={() => DialogDeleteOpen(product)}
-                >
-                  <Delete />
-                </IconButton>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+
+      <TableComponent 
+        products={products} 
+        DialogUpdateOpen={DialogUpdateOpen}
+        DialogDeleteOpen={DialogDeleteOpen}
+      />
+      
     </div>
   );
 }
